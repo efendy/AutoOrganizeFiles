@@ -1,0 +1,24 @@
+#!/bin/bash
+# stop -{} <executable>
+#  -a : stop all
+#  -p : pid
+
+if [[ $# -lt 1 ]]
+then
+  echo "usage:"
+  exit
+fi
+
+if ! [[ -f "$2" ]]; then
+  echo "$2 does not exist"
+  exit
+fi
+
+EXECUTABLE=$1
+while [[ $# -gt 1 ]]
+do
+  EXECUTABLE="${EXECUTABLE} ${2}"
+  shift
+done
+
+echo $EXECUTABLE

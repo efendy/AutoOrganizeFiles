@@ -1,0 +1,35 @@
+#!/bin/bash
+if [[ $# -lt 2 ]]; then
+  echo "usage:"
+  exit
+fi
+
+if ! [[ -f "$2" ]]; then
+  echo "$2 does not exist"
+  exit
+fi
+
+EXECUTABLE=$1
+RECORD=pid
+if ! [[ -d "$RECORD" ]]; then
+  mkdir $RECORD
+  echo "no running process: ${EXECUTABLE}"
+  exit
+fi
+
+RECORD_LEN=$(ls -l ${RECORD} | grep ${EXECUTABLE}-process | wc -l)
+if [[ $RECORD_LEN -gt 0 ]]; then
+  RUNNING_LIST=$(ls -l ${RECORD} | grep ${EXECUTABLE}-process | rev | cut -d' ' -f1 | rev)
+  for RUNNING_PROCESS in $RUNNING_LIST; do
+    EXECUTABLE_ARGS=$(cat ${RECORD}/${RUNNING_PROCESS})
+    PID=$(echo ${RUNNING_PROCESS} | cut -d'.' -f2)
+    PSRESULT=$(ps -e | grep "^${PID}")
+    if [[ -z $PSRESULT ]]; then
+      rm ${RECORD}/${RUNNING_PROCESS}
+    else
+      echo "${RUNNING_PROCESS} ${EXECUTABLE_ARGS}"
+    fi
+  done
+else
+  echo "no running process: ${EXECUTABLE}"
+fi
